@@ -91,6 +91,7 @@ async def post_programme(request: ProgrammeValidator):
     return {"unique_key": str(key)}
 
 
+@programmeRouter.get("/programme/flash/{programme_id}")
 async def flash_programme(programme_id: str, index: int = 0) -> Dict[str, Any]:
     """
     Get programme data and format it for flash display.
@@ -112,7 +113,44 @@ async def flash_programme(programme_id: str, index: int = 0) -> Dict[str, Any]:
 
     next_index = -1 if index == len(programme_data.get("data")) - 1 else index + 1
     response = {
+        "number of junks": len(programme_data.get("data")),
         "next": next_index,
+        "data": data_string,
+        "size": len(data_string)
+    }
+
+    return response
+
+
+@programmeRouter.get("/programme/flash/name/{programme_name}")
+async def flash_programme_by_name(programme_name: str, index: int = 0) -> dict:
+    """
+    Retrieves a programme by its name and returns the programme data at the specified index.
+
+    Parameters:
+    - programme_name: str, the name of the programme to retrieve
+    - index: int, optional, the index of the programme data to retrieve (default is 0)
+
+    Returns:
+    - dict: A dictionary containing the number of programme data items, the next index, the combined data string, and the size of the data string.
+    """
+    # Check if the programme exists
+    programme_data = get_programme_by_name(programme_name)
+    if programme_data is None:
+        raise HTTPException(status_code=400, detail="Cannot find programme")
+
+    # Check for valid index and retrieve data
+    programme_data_items = programme_data.get("data")
+    if index < 0 or index >= len(programme_data_items):
+        raise HTTPException(status_code=400, detail="Invalid index value")
+
+    # Generate data string and prepare response
+    data = programme_data_items[index]
+    data_string = "\n".join(data)
+    next_index = index + 1 if index < len(programme_data_items) - 1 else -1
+    response = {
+        "number of junks": len(programme_data_items),
+        "next index": next_index,
         "data": data_string,
         "size": len(data_string)
     }

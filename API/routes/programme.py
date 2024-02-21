@@ -109,14 +109,15 @@ async def flash_programme(programme_id: str, index: int = 0) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail="Invalid index value")
 
     data = programme_data.get("data")[index]
-    data_string = "\n:".join(data)
+    data_string = "\n".join(data)
 
     next_index = -1 if index == len(programme_data.get("data")) - 1 else index + 1
     response = {
         "number of junks": len(programme_data.get("data")),
         "next": next_index,
         "data": data_string,
-        "size": len(data_string)
+        "size": len(data_string),
+        "next junk size": len(programme_data.get("data")[next_index]) if next_index != -1 else "N/A"
     }
 
     return response

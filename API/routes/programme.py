@@ -148,12 +148,14 @@ async def flash_programme_by_name(programme_name: str, index: int = 0) -> dict:
     # Generate data string and prepare response
     data = programme_data_items[index]
     data_string = "\n".join(data)
-    next_index = index + 1 if index < len(programme_data_items) - 1 else -1
+    next_index = index + 1 if index < len(data) - 1 else -1
     response = {
         "number of junks": len(programme_data_items),
         "next index": next_index,
         "data": data_string,
-        "size": len(data_string)
+        "size": len(data_string),
+        "number of records in junk": len(programme_data_items[index]),
+        "next junk size": len(programme_data_items[next_index]) if next_index != -1 else "N/A"
     }
 
     return response
